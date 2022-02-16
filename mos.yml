@@ -1,5 +1,5 @@
-author: mongoose-os
-description: A JS-enabled demo Mongoose OS firmware
+author: Oleh Biriukov<ol.biriukov@gmail.com>
+description: Roller blinds IOT control
 # arch: PLATFORM
 version: 1.0
 manifest_version: 2017-05-18
@@ -8,18 +8,152 @@ modules_version: ${mos.version}
 mongoose_os_version: ${mos.version}
 
 config_schema:
-  - ["mqtt.server", "mqtt.eclipseprojects.io:1883"]
-  - ["i2c.enable", true]
+  - ["dash.enable", true]
+  - ["dash.token", "0JMIBAi7YLYRMG8iMLvFmA"]
+  - ["wifi.ap.enable", true ]
+  - ["wifi.ap.ssid", "RollerBlinds_??????"]
+  - ["wifi.ap.pass", "rollerblinds"]
+  - ["wifi.ap.ip", "192.168.4.1"]
+  - ["wifi.ap.netmask", "255.255.255.0"]
+  - ["wifi.sta.enable", true ]
+  - ["rollerblinds.settings.stepsOffset", "i", 0, {title: "Steps offset"}]
+  - ["rollerblinds.settings.stepsPerMovement", "i", 0, {title: "Steps count for full movement"}]
+  - ["rollerblinds.settings.inverseRotation", "b", false, {title: "Inverse rotation"}]
+  - ["jsonschemawebui.customconfig.schema", '{
+    "title": "Roller Blinds",
+    "type": "object",
+    "required": ["actions", "calibrate"],
+    "properties": {
+      "sta": {
+        "type": "object",
+        "title": "Hotspot WIFI Setup",
+        "format": "grid",
+        "properties": {
+          "ssid": {
+            "type": "string",
+            "title": "SSID"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        }
+      },
+      "ap": {
+        "type": "object",
+        "title": "Access Point WIFI Setup",
+        "format": "grid",
+        "properties": {
+          "ssid": {
+            "type": "string",
+            "title": "SSID"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        }
+      },
+      "actions": {
+        "type": "object",
+        "title": "Operations",
+        "format": "grid",
+        "properties": {
+          "open": {
+            "type": "button",
+            "title": "Open",
+            "options": {
+              "button": {
+                "action": "rpc-call",
+                "rpc-call": {
+                  "name": "Blinds.Open"
+                }
+              }
+            }
+          },
+          "close": {
+            "type": "button",
+            "title": "Close",
+            "options": {
+              "button": {
+                "action": "rpc-call",
+                "rpc-call": {
+                  "name": "Blinds.Close"
+                }
+              }
+            }
+          }
+        }
+      },
+      "calibrate": {
+        "type": "object",
+        "title": "Calibrate",
+        "format": "grid",
+        "properties": {
+          "stepsPerMovement": {
+            "title": "Steps for full movement",
+            "type": "integer",
+            "minimum": 0
+          },
+          "inverseRotation": {
+            "title": "Inverse rotation",
+            "type": "boolean"
+          },
+          "setPositionAsZero": {
+            "type": "button",
+            "title": "Set position as zero",
+            "options": {
+              "button": {
+                "action": "rpc-call",
+                "rpc-call": {
+                  "name": "Blinds.SetPositionAsZero"
+                }
+              }
+            }
+          }
+        }
+      },
+      "submit": {
+        "type": "button",
+        "title": "Save and reboot",
+        "options": {
+          "button": {
+            "action": "save-config",
+            "save-config": {
+              "reboot": true
+            }
+          }
+        }
+      }
+    }
+  }']
+  - ["jsonschemawebui.customconfig.mapping", '{
+      "sta.ssid": "wifi.sta.ssid",
+      "sta.password": "wifi.sta.pass",
+      "ap.ssid": "wifi.ap.ssid",
+      "ap.password": "wifi.ap.pass",
+      "calibrate.stepsPerMovement": "rollerblinds.settings.stepsPerMovement",
+      "calibrate.inverseRotation": "rollerblinds.settings.inverseRotation"
+  }']
 
 tags:
   - js
+  - roller blinds
 
 filesystem:
   - fs
 
 libs:
+  - location: https://github.com/mongoose-os-libs/core
+  - location: https://github.com/mongoose-os-libs/rpc-service-fs
+  - location: https://github.com/mongoose-os-libs/rpc-uart
   - location: https://github.com/mongoose-os-libs/boards
-  - location: https://github.com/mongoose-os-libs/js-demo-bundle
+  - location: https://github.com/mongoose-os-libs/mjs
+  - location: https://github.com/mongoose-os-libs/sntp
+  - location: https://github.com/mongoose-os-libs/ca-bundle
+  - location: https://github.com/mongoose-os-libs/dash
+  - location: https://github.com/all-bear/mongoose-os.json-schema-web-ui
+
 
 conds:
   - when: mos.platform == "esp32"

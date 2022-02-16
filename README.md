@@ -1,6 +1,6 @@
-# JS-enabled demo Mongoose OS firmware
+# Roller Blinds IOT
 
-This is the JS demo Mongoose OS app. It gets installed by default at
-[Mongoose OS installation step](https://mongoose-os.com/docs/). It has
-a lot of functionality enabled - cloud integrations, JavaScript engine, etc.
-Its main purpose is to demonstrate the capabilities of Mongoose OS.
+IOT control of roller blinds.
+EasyDriver used as driver for stepper.
+Control is done over RPC which could be called over mDash or something similar.
+All settings are available over Web UI. (https://github.com/all-bear/mongoose-os.json-schema-web-ui)
